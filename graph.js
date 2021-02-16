@@ -2,7 +2,7 @@ console.log('graph.js connected')
 
 const dims = { height: 300, width: 300, radius: 150 };
 const center = { x: (dims.width / 2 + 5), y: (dims.height / 2 + 5)};
-
+const t = d3.transition().duration(500)
 // create svg container
 const svg = d3.select('.canvas')
   .append('svg')
@@ -28,15 +28,20 @@ const color = d3.scaleOrdinal(d3['schemeSet2'])
 
 //update function to pass thru pie and arc generator
 const update = (data) => {
-  //update color scale domain
-  color.domain(data.map(item => item.name))
+    //update color scale domain
+    color.domain(data.map(item => item.name))
 
     // join enhanced (pie) data to path elements
     const paths = graph.selectAll('path')
       .data(pie(data));//get data with angles attached
   
-    //console.log(paths.enter());
-  
+    //remove deleted elements from chart
+    paths.exit().remove()
+
+    //update elements currently in DOM
+    paths.attr('d', arcPath)
+       
+    //append selection to DOM
     paths.enter()
       .append('path')
         .attr('class', 'arc')
