@@ -10,10 +10,12 @@
 
     <title>Budget Planner</title>
     <style>
-        h2, p{
+        h2,
+        p {
             margin: 10px 0;
         }
-        header{
+
+        header {
             margin-bottom: 40px
         }
     </style>
@@ -58,7 +60,27 @@
             </div>
         </div>
     </body>
-
+    <!-- The core Firebase JS SDK is always required and must be listed first -->
+    <script src="https://www.gstatic.com/firebasejs/8.2.7/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.2.7/firebase-firestore.js"></script>
+    <script>
+        // Your web app's Firebase configuration
+        var firebaseConfig = {
+            apiKey: "AIzaSyCXZBou7LiF9XfelL7ufMQ6u6NjOZdJpyo",
+            authDomain: "d3data-13a3e.firebaseapp.com",
+            projectId: "d3data-13a3e",
+            storageBucket: "d3data-13a3e.appspot.com",
+            messagingSenderId: "956483928857",
+            appId: "1:956483928857:web:16499cf623d501ba887b88"
+        };
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const settings = {
+            timestampsInSnapshots: true
+        }
+        db.settings(settings)
+    </script>
 
     <script src="https://d3js.org/d3.v6.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
