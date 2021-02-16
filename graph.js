@@ -2,7 +2,7 @@ console.log('graph.js connected')
 
 const dims = { height: 300, width: 300, radius: 150 };
 const center = { x: (dims.width / 2 + 5), y: (dims.height / 2 + 5)};
-const t = d3.transition().duration(500)
+// const t = d3.transition().duration(500)
 // create svg container
 const svg = d3.select('.canvas')
   .append('svg')
@@ -45,10 +45,12 @@ const update = (data) => {
     paths.enter()
       .append('path')
         .attr('class', 'arc')
-        .attr('d', arcPath)
+        // .attr('d', arcPath) don't need this anymore because of Tween
         .attr('stroke', '#fff')
         .attr('stroke-width', 3)
         .attr('fill', item => color(item.data.name))
+        .transition().duration(750)
+        .attrTween('d', arcTweenEnter)
 };
 
 //firestore listener
@@ -77,3 +79,13 @@ db.collection('expenses').onSnapshot(res => {
     update(data)
 });
 
+// =================== TWEENS ===================
+const arcTweenEnter = (data) => {
+    //spit out a value between 0 and 1 every time you call it
+    let i = d3.interpolate(data.endAngle, data.startAngle)
+    //starts at endAngle
+    return function(t){
+        data.startAngle = i(t)
+        return arcPath(data)
+    }
+}
