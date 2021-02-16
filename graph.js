@@ -24,24 +24,27 @@ const arcPath = d3.arc()
   .outerRadius(dims.radius)
   .innerRadius(dims.radius / 2);
 
+const color = d3.scaleOrdinal(d3['schemeSet2'])
 
 //update function to pass thru pie and arc generator
 const update = (data) => {
-  
+  //update color scale domain
+  color.domain(data.map(item => item.name))
+
     // join enhanced (pie) data to path elements
     const paths = graph.selectAll('path')
       .data(pie(data));//get data with angles attached
   
-    console.log(paths.enter());
+    //console.log(paths.enter());
   
     paths.enter()
       .append('path')
         .attr('class', 'arc')
         .attr('d', arcPath)
         .attr('stroke', '#fff')
-        .attr('stroke-width', 3);
-  console.log('lol')
-  };
+        .attr('stroke-width', 3)
+        .attr('fill', item => color(item.data.name))
+};
 
 //firestore listener
 let data = []
