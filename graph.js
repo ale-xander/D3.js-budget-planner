@@ -31,7 +31,8 @@ const color = d3.scaleOrdinal(d3['schemeSet2'])
 const legendGroup = svg.append('g')
   .attr('transform', `translate(${dims.width + 40}, 10)`);
 const legend = d3.legendColor()
-  .shape('square')
+  // .shape('square')
+  .shape('path', d3.symbol().type(d3.symbolCircle)())
   .shapePadding(10)
   .scale(color)
 
@@ -70,6 +71,11 @@ const update = (data) => {
         .each(function(d){ this._current = d })// this refers to current path. _current is a made up property
         .transition().duration(750)
         .attrTween('d', arcTweenEnter)
+
+    // add event listeners
+    graph.selectAll('path')
+    .on('mouseover', handleMouseOver)
+    .on('mouseout', handleMouseOut);
 };
 
 //firestore listener
@@ -97,6 +103,25 @@ db.collection('expenses').onSnapshot(res => {
     })
     update(data)
 });
+
+
+// =================== EVENT HANDLERS ===================
+const handleMouseOver = (event, d) => {
+  //console.log(event.currentTarget);
+  d3.select(event.currentTarget)
+  .transition('changeSliceFill')
+  .duration(200)
+  .attr("fill", "#fff");
+};
+const handleMouseOut = (event, d) => {
+  //console.log(event.currentTarget);
+  d3.select(event.currentTarget)
+  .transition('changeSliceFill')
+  .duration(200)
+  .attr("fill", color(d.data.name));
+};
+
+
 
 // =================== TWEENS ===================
 const arcTweenEnter = (data) => {
