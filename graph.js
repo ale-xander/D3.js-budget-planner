@@ -75,7 +75,8 @@ const update = (data) => {
     // add event listeners
     graph.selectAll('path')
     .on('mouseover', handleMouseOver)
-    .on('mouseout', handleMouseOut);
+    .on('mouseout', handleMouseOut)
+    .on('mouseover', handleClick)
 };
 
 //firestore listener
@@ -113,6 +114,7 @@ const handleMouseOver = (event, d) => {
   .duration(200)
   .attr("fill", "#fff");
 };
+
 const handleMouseOut = (event, d) => {
   //console.log(event.currentTarget);
   d3.select(event.currentTarget)
@@ -121,6 +123,11 @@ const handleMouseOut = (event, d) => {
   .attr("fill", color(d.data.name));
 };
 
+const handleClick = (event, d) => {
+  console.log(d.data.id);
+  const id = d.data.id;
+  db.collection("expenses").doc(id).delete();
+};
 
 
 // =================== TWEENS ===================
