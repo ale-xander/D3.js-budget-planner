@@ -24,22 +24,39 @@ const arcPath = d3.arc()
   .outerRadius(dims.radius)
   .innerRadius(dims.radius / 2);
 
+//pick a color scheme
 const color = d3.scaleOrdinal(d3['schemeSet2'])
+
+//legend for the pie chart.   https://d3-legend.susielu.com/
+const legendGroup = svg.append('g')
+  .attr('transform', `translate(${dims.width + 40}, 10)`);
+const legend = d3.legendColor()
+  .shape('square')
+  .shapePadding(10)
+  .scale(color)
 
 //update function to pass thru pie and arc generator
 const update = (data) => {
     //update color scale domain
     color.domain(data.map(item => item.name))
 
+    //update and call legend
+    legendGroup.call(legend)
+    legendGroup.selectAll('text').attr('fill', 'white')
+
     // join enhanced (pie) data to path elements
     const paths = graph.selectAll('path')
       .data(pie(data));//get data with angles attached
   
     //remove deleted elements from chart
-    paths.exit().remove()
+    paths.exit()
+            .transition().duration(750)
+            .attrTween('d', arcTweenExit)
+            .remove()
 
     //update elements currently in DOM
-    paths.attr('d', arcPath)
+    paths.transition().duration(750)
+    .attrTween("d", arcTweenUpdate);
        
     //append selection to DOM
     paths.enter()
@@ -49,6 +66,8 @@ const update = (data) => {
         .attr('stroke', '#fff')
         .attr('stroke-width', 3)
         .attr('fill', item => color(item.data.name))
+        //.each allows you to perform a function on every single element
+        .each(function(d){ this._current = d })// this refers to current path. _current is a made up property
         .transition().duration(750)
         .attrTween('d', arcTweenEnter)
 };
@@ -89,3 +108,25 @@ const arcTweenEnter = (data) => {
         return arcPath(data)
     }
 }
+
+const arcTweenExit = (data) => {
+    let i = d3.interpolate(data.startAngle, data.endAngle)
+    return function(t){
+        data.startAngle = i(t)
+        return arcPath(data)
+    }
+}
+
+// use function keyword to allow use of 'this'
+function arcTweenUpdate(data) {
+    console.log(this._current, data);
+    // interpolate between the two objects
+    let i = d3.interpolate(this._current, data);
+    // update the current prop with new updated data
+    this._current = i(1);
+  
+    return function(t) {
+      // i(t) returns a value of d (data object) which we pass to arcPath
+      return arcPath(i(t));
+    };
+  };
