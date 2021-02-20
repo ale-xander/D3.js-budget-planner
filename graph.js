@@ -36,6 +36,19 @@ const legend = d3.legendColor()
   .shapePadding(10)
   .scale(color)
 
+// tool tip for item name, cost.     github.com/bumbeishvili/d3-v6-tip
+const tip = d3
+  .tip()
+  .attr("class", "d3-tip card lol") // We add the d3-tip class instead of the tip class
+  .html((event, d) => { // It's (event, d) instead of just (d) in v6
+    let content = `<div class="name">${d.data.name}</div>`;
+    content += `<div class="cost">$${d.data.cost}</div>`;
+    content += `<div class="delete">Click slice to delete</div>`;
+    return content;
+  });
+ graph.call(tip);
+
+
 //update function to pass thru pie and arc generator
 const update = (data) => {
     //update color scale domain
@@ -73,10 +86,17 @@ const update = (data) => {
         .attrTween('d', arcTweenEnter)
 
     // add event listeners
-    graph.selectAll('path')
-    .on('mouseover', handleMouseOver)
-    .on('mouseout', handleMouseOut)
-    .on('mouseover', handleClick)
+    graph
+    .selectAll("path")
+    .on("mouseover", (event, d) => {
+      tip.show(event, d);
+      handleMouseOver(event, d);
+    })
+    .on("mouseout", (event, d) => {
+      tip.hide();
+      handleMouseOut(event, d);
+    })
+    .on("click", handleClick);
 };
 
 //firestore listener
